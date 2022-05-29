@@ -87,10 +87,20 @@ def get_relevant_data(mode, crypto_name=None, in_fiat=None):
         r = get_json_response(mode, crypto_name, in_fiat)  # response
         converted = convert_response_to_relevant_dict(r, 2, crypto_name, in_fiat)
 
-        return converted
+        crypto_change = converted[crypto_name][f'{in_fiat}_24h_change']
+        if crypto_change < 0:
+            change = f"🔻24hr ➡️ {crypto_change}"
+        else:
+            change = f"🔺24hr ➡️ {crypto_change}"
+
+        msg = f"{crypto_name} price at {converted[crypto_name]['last_updated_at']}: {converted[crypto_name][in_fiat]} {change}\n\n"
+
+        return msg
+
     else:  # daily news from crypto world
         pass
 
 
 print(get_relevant_data(1))  # test mode 1
+print()
 print(get_relevant_data(2, "solana", "usd"))  # test mode 2
