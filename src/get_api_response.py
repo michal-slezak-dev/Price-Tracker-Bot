@@ -69,14 +69,14 @@ def get_relevant_data(mode, crypto_name=None, in_fiat=None):
 
         btc_change, eth_change = converted['btc']['usd_24h_change'], converted['eth']['usd_24h_change']
         if btc_change < 0:
-            btc_change = f"🔻24hr ➡ ️{btc_change}"
+            btc_change = f"🔻24hr ➡️ {btc_change}"
         else:
             btc_change = f"🔺24hr ➡️ {btc_change}"
 
         if eth_change < 0:
-            eth_change = f"🔻24hr ➡ ️{eth_change}"
+            eth_change = f"🔻24hr ➡️ ️{eth_change}"
         else:
-            eth_change = f"🔺24hr ➡ ️{eth_change}"
+            eth_change = f"🔺24hr ➡️ ️{eth_change}"
 
         msg = f"BTC price at {converted['btc']['last_updated_at']}: {converted['btc']['usd']} {btc_change}\n\n"
         msg += f"ETH price at {converted['eth']['last_updated_at']}: {converted['eth']['usd']} {eth_change}"
