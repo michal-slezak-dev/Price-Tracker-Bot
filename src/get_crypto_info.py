@@ -17,25 +17,24 @@ def get_last_update(r: dict, crypto_name: str) -> str:  # get formatted date of 
 
 def convert_response_to_relevant_dict(mode: int, crypto_name=None, in_fiat=None) -> dict:
     r = get_json_response(crypto_name, in_fiat)  # get API response
+    crypto_dict = defaultdict(dict)  # get a new dict with shortened "crypto" name -> bitcoin => btc etc.
     if mode == 1:
         btc, eth, usd = "bitcoin", "ethereum", "usd"
         r[btc][f"{usd}_24h_change"], r[eth][f"{usd}_24h_change"] = get_24hr_change(r, btc, usd), get_24hr_change(r, eth, usd)
 
         r[btc]["last_updated_at"], r[eth]["last_updated_at"] = get_last_update(r, btc), get_last_update(r, eth)
 
-        btc_and_eth = defaultdict(dict)  # get a new dict with shortened "crypto" name -> bitcoin => btc etc.
-        btc_and_eth["btc"], btc_and_eth["eth"] = r[btc], r[eth]
+        crypto_dict["btc"], crypto_dict["eth"] = r[btc], r[eth]
 
-        return dict(btc_and_eth)
+        return dict(crypto_dict)
     elif mode == 2:
         r[crypto_name][f"{in_fiat}_24h_change"] = get_24hr_change(r, crypto_name, in_fiat)
 
         r[crypto_name]["last_updated_at"] = get_last_update(r, crypto_name)
 
-        crypto = defaultdict(dict)
-        crypto[crypto_name] = r[crypto_name]
+        crypto_dict[crypto_name] = r[crypto_name]
 
-        return dict(crypto)
+        return dict(crypto_dict)
 
 
 def get_relevant_data(mode: int, crypto_name=None, in_fiat=None) -> str:
