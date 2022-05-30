@@ -1,45 +1,24 @@
-import requests
 from datetime import datetime
 from collections import defaultdict
-
-
-def get_json_response(mode, crypto=None, in_fiat=None):
-    url = "https://api.coingecko.com/api/v3/simple/price"
-    if mode == 1:  # daily tweet
-        params = {
-            "ids": "bitcoin,ethereum",
-            "vs_currencies": "usd",
-            "include_24hr_change": "true",
-            "include_last_updated_at": "true"
-        }
-
-    elif mode == 2:  # responds if mentioned
-        params = {
-            "ids": f"{crypto}",
-            "vs_currencies": f"{in_fiat}",
-            "include_24hr_change": "true",
-            "include_last_updated_at": "true"
-        }
-
-    response = requests.get(url, params)
-    try:
-        info = response.json()
-    except Exception as e:
-        print(e)
-    else:
-        return info
+from get_api_response import get_json_response
 
 
 def convert_timestamp(data):
     return datetime.fromtimestamp(data).strftime("%d-%m-%y %H:%M:%S")
 
+def get_24hr_change(r, crypto_name, in_fiat):
+    return r[crypto_name][f"{in_fiat}_24h_change"]
 
-def convert_response_to_relevant_dict(r, mode, crypto_name=None, in_fiat=None):  # TODO: turn modes 1 & 2 into 1
+def get_last_update(r, crypto_name):
+    return r[crypto_name]["last_updated_at"]
+
+def convert_response_to_relevant_dict(mode, crypto_name=None, in_fiat=None):  # TODO: turn modes 1 & 2 into 1
+    r = get_json_response(crypto_name, in_fiat)
     if mode == 1:
-        btc_change, eth_change = r["bitcoin"]["usd_24h_change"], r["ethereum"]["usd_24h_change"]
+        btc_change, eth_change = get_24hr_change(r, "bitcoin", "usd"), get_24hr_change(r, "ethereum", "usd")
         r["bitcoin"]["usd_24h_change"], r["ethereum"]["usd_24h_change"] = round(btc_change, 2), round(eth_change, 2)
 
-        btc_update, eth_update = r["bitcoin"]["last_updated_at"], r["ethereum"]["last_updated_at"]
+        btc_update, eth_update = get_last_update(r, "bitcoin"), get_last_update(r, "ethereum")
         btc_timestamp, eth_timestamp = convert_timestamp(btc_update), convert_timestamp(eth_update)
         r["bitcoin"]["last_updated_at"], r["ethereum"]["last_updated_at"] = btc_timestamp, eth_timestamp
 
@@ -48,10 +27,10 @@ def convert_response_to_relevant_dict(r, mode, crypto_name=None, in_fiat=None): 
 
         return dict(btc_and_eth)
     elif mode == 2:
-        crypto_change = r[crypto_name][f"{in_fiat}_24h_change"]
+        crypto_change = get_24hr_change(r, crypto_name, in_fiat)
         r[crypto_name][f"{in_fiat}_24h_change"] = round(crypto_change, 2)
 
-        crypto_update = r[crypto_name]["last_updated_at"]
+        crypto_update = get_last_update(r, crypto_name)
         crypto_timestamp = convert_timestamp(crypto_update)
         r[crypto_name]["last_updated_at"] = crypto_timestamp
 
@@ -64,8 +43,7 @@ def convert_response_to_relevant_dict(r, mode, crypto_name=None, in_fiat=None): 
 
 def get_relevant_data(mode, crypto_name=None, in_fiat=None):
     if mode == 1:  # daily tweet
-        r = get_json_response(mode)  # response
-        converted = convert_response_to_relevant_dict(r, 1)
+        converted = convert_response_to_relevant_dict(1, "bitcoin,ethereum", "usd")
 
         btc_change, eth_change = converted['btc']['usd_24h_change'], converted['eth']['usd_24h_change']
         if btc_change < 0:
@@ -84,8 +62,7 @@ def get_relevant_data(mode, crypto_name=None, in_fiat=None):
         return msg
 
     elif mode == 2:  # responds if mentioned
-        r = get_json_response(mode, crypto_name, in_fiat)  # response
-        converted = convert_response_to_relevant_dict(r, 2, crypto_name, in_fiat)
+        converted = convert_response_to_relevant_dict(2, crypto_name, in_fiat)
 
         crypto_change = converted[crypto_name][f'{in_fiat}_24h_change']
         if crypto_change < 0:
