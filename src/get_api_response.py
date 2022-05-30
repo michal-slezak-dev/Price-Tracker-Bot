@@ -1,7 +1,7 @@
 import requests
 
 
-def get_json_response(crypto=None, in_fiat=None):
+def get_json_response(crypto=None, in_fiat=None) -> dict:
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {
         "ids": f"{crypto}",
