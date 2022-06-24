@@ -4,22 +4,28 @@ from get_api_response import get_json_response
 
 
 def convert_timestamp(data: int) -> str:  # format timestamp - d-m-y H:M:S f.e. (28-05-22 02:23:03)
+    """Converts timestamp data to a normal data format"""
     return datetime.fromtimestamp(data).strftime("%d-%m-%y %H:%M:%S")
 
 
 def get_24hr_change(r: dict, crypto_name: str, in_fiat: str) -> float:  # f.e. 5.234321 -> 5.23
+    """Rounds the 24hr change ==> x.yyyyyy => x.yy"""
     return round(r[crypto_name][f"{in_fiat}_24h_change"], 2)
 
 
 def get_last_update(r: dict, crypto_name: str) -> str:  # get formatted date of the last update
+    """Returns formatted the last update data provided as timestamp"""
     return convert_timestamp(r[crypto_name]["last_updated_at"])
 
 
 def convert_if_zero(str_float: str) -> str:  # (convert) get rid of the part after '.' if this part consists of only '0'
+    """Gets rid of the part after "." if it consists of only zeros"""
     return str_float.split(".")[0]
 
 
 def buy_sell_amount(price4one: float, buy_or_sell: bool = None, fiat_amount: float = None, amount: float = None) -> str:
+    """Displays the amount of crypto that can be bought for a particular amount of money or displays the amount of money
+     that can be received after selling some crypto"""
     result = ""
     if buy_or_sell:  # True -> buy
         result = "{:f}".format(fiat_amount / price4one).rstrip("0")
@@ -34,6 +40,7 @@ def buy_sell_amount(price4one: float, buy_or_sell: bool = None, fiat_amount: flo
 
 
 def convert_response_to_relevant_dict(mode: int, crypto_name: str = None, in_fiat: str = None) -> dict:
+    """Converts the API response to a dictionary with shortened name of a cryptocurrency"""
     r = get_json_response(crypto_name, in_fiat)  # get API response
     crypto_dict = defaultdict(dict)  # get a new dict with shortened "crypto" name -> bitcoin => btc etc.
 
@@ -57,6 +64,10 @@ def convert_response_to_relevant_dict(mode: int, crypto_name: str = None, in_fia
 
 
 def get_relevant_data(mode: int, crypto_name: str = None, in_fiat: str = None, buy_or_sell: bool = None, fiat: float = None, crypto_amount: float = None) -> str:
+    """Returns the message to be sent depending on the mode:
+    1. create daily tweets with information about BTC & ETH price + 24hr change
+    2. respond (if mentioned) with information about the price of a particular cryptocurrency or
+    the amount of crypto that can be bought/amount of money that can be receive after selling some crypto"""
     if mode == 1:  # daily tweet
         converted = convert_response_to_relevant_dict(1, "bitcoin,ethereum", "usd")
 
@@ -88,7 +99,7 @@ def get_relevant_data(mode: int, crypto_name: str = None, in_fiat: str = None, b
         else:
             change = f"🔺24hr ➡️ {crypto_change}"
 
-        msg = f"{crypto_name} price at {converted[crypto_name]['last_updated_at']}: {crypto_price} {change}\n"
+        msg = f"{crypto_name.upper()} price at {converted[crypto_name]['last_updated_at']}: {crypto_price} {in_fiat.upper()} {change}\n"
         if buy_or_sell:  # True -> buy
             buy = buy_sell_amount(crypto_price, True, fiat)
             msg += f"For {fiat} {in_fiat.upper()}, you can buy: {buy} {crypto_name.upper()}"
@@ -99,11 +110,11 @@ def get_relevant_data(mode: int, crypto_name: str = None, in_fiat: str = None, b
 
         return msg
 
-#  TODO add necessary comments so as to make the code more readable ;-)
-print(get_relevant_data(1))  # test mode 1
-print()
-print(get_relevant_data(2, "dogecoin", "usd"))  # test mode 2 without "buy/sell"
-print()
-print(get_relevant_data(2, "dogecoin", "usd", True, 10))  # test mode 2 with "buy"
-print()
-print(get_relevant_data(2, "dogecoin", "usd", False, crypto_amount=116.061791))  # test mode 2 with "sell"
+
+# print(get_relevant_data(1))  # test mode 1
+# print()
+# print(get_relevant_data(2, "dogecoin", "usd"))  # test mode 2 without "buy/sell"
+# print()
+# print(get_relevant_data(2, "dogecoin", "usd", True, 10))  # test mode 2 with "buy"
+# print()
+# print(get_relevant_data(2, "dogecoin", "usd", False, crypto_amount=116.061791))  # test mode 2 with "sell"
