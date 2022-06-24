@@ -63,7 +63,7 @@ async def price(update: Update, context: CallbackContext):
 
 
 async def buy(update: Update, context: CallbackContext):
-    """show what amount of a cryptocurrency could be bough for a particular amount of money (FIAT)"""
+    """responds with the amount of a cryptocurrency that can be bought for a particular amount of money (FIAT currency)"""
     user_text = update.message.text.split()
     error = """Your message must look like this ⬇
 /buy cryptocurrency fiat_currency_code amount_of_fiat_currency"""
@@ -84,7 +84,7 @@ async def buy(update: Update, context: CallbackContext):
 
 
 async def sell(update: Update, context: CallbackContext):
-    """show the amount of money that could be received after selling some crypto"""
+    """responds with the amount of money that could be received after selling a particular amount of crypto"""
     user_text = update.message.text.split()
     error = """Your message must look like this ⬇
 /buy cryptocurrency fiat_currency_code amount_of_fiat_currency"""
