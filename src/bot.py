@@ -18,11 +18,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """display available commands"""
     await context.bot.send_message(chat_id=update.effective_chat.id, text="""Available commands ⬇️:
-/price - to get the current price (in chosen FIAT currency) of a particular cryptocurrency 
+/price - to get the current price (in chosen FIAT currency) of a particular cryptocurrency ➡️ e.g. /price bitcoin usd
 
-/buy - to get the amount of a particular cryptocurrency that could be bought for a particular amount of money (in chosen FIAT currency)
+/buy - to get the amount of a particular cryptocurrency that could be bought for a particular amount of money (in chosen FIAT currency) ➡️ e.g. /buy bitcoin usd 10
 
-/sell - to get the amount of money (in chosen FIAT currency) that could be received after selling a particular amount of a cryptocurrency 
+/sell - to get the amount of money (in chosen FIAT currency) that could be received after selling a particular amount of a cryptocurrency ➡️ e.g. /sell bitcoin usd 0.0032
     """)
 
 
@@ -69,7 +69,7 @@ async def buy(update: Update, context: CallbackContext):
 /buy cryptocurrency fiat_currency_code amount_of_fiat_currency"""
 
     if len(user_text) == 4:  # check if user_input is in a proper format
-        # e.g. /price dogecoin usd => ['/price', 'dogecoin', 'usd', '10']
+        # e.g. /price dogecoin usd => ['/buy', 'dogecoin', 'usd', '10']
         crypto, fiat_currency, amount_fiat = update.message.text.split()[1], update.message.text.split()[2], update.message.text.split()[3]
 
         try:
@@ -87,10 +87,10 @@ async def sell(update: Update, context: CallbackContext):
     """responds with the amount of money that could be received after selling a particular amount of crypto"""
     user_text = update.message.text.split()
     error = """Your message must look like this ⬇
-/buy cryptocurrency fiat_currency_code amount_of_fiat_currency"""
+/sell cryptocurrency fiat_currency_code amount_of_fiat_currency"""
 
     if len(user_text) == 4:
-        # e.g. /price dogecoin usd => ['/price', 'dogecoin', 'usd', '10']
+        # e.g. /price dogecoin usd => ['/sell', 'dogecoin', 'usd', '10']
         crypto, fiat_currency, amount_crypto = update.message.text.split()[1], update.message.text.split()[2], \
                                              update.message.text.split()[3]
 
