@@ -1,7 +1,8 @@
 import logging
+import os
 from config import TELEGRAM_TOKEN
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, CallbackContext, MessageHandler, filters
+from telegram.ext import Updater, ApplicationBuilder, ContextTypes, CommandHandler, CallbackContext, MessageHandler, filters
 from get_crypto_info import get_relevant_data
 
 logging.basicConfig(
@@ -107,6 +108,7 @@ async def sell(update: Update, context: CallbackContext):
 
 if __name__ == '__main__':
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    # updater = Updater(token=TELEGRAM_TOKEN)
 
     # add commands
     start_handler = CommandHandler('start', start)
@@ -131,4 +133,6 @@ if __name__ == '__main__':
     unknown_not_command_handler = MessageHandler(filters.TEXT, unknown_not_command)
     app.add_handler(unknown_not_command_handler)
 
-    app.run_polling()
+    app.run_webhook(listen="0.0.0.0", port=os.environ.get("PORT", 443), url_path=TELEGRAM_TOKEN,
+                    webhook_url=f"htpps://price-tracker-bot-crypto@heroku.com/{TELEGRAM_TOKEN}")
+    # updater.idle()
