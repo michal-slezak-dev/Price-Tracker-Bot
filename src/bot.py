@@ -134,5 +134,5 @@ if __name__ == '__main__':
     app.add_handler(unknown_not_command_handler)
 
     app.run_webhook(listen="0.0.0.0", port=os.environ.get("PORT", 443), url_path=TELEGRAM_TOKEN,
-                    webhook_url=f"htpps://price-tracker-bot-crypto@heroku.com/{TELEGRAM_TOKEN}")
+                    webhook_url=f"htpps://price-tracker-bot-crypto.herokuapp.com/{TELEGRAM_TOKEN}")
     # updater.idle()
